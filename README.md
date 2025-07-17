@@ -1,6 +1,6 @@
 # ofd-doc
 
-## QPOS MARKETPLACE
+## QPOS
 - ZReport
     - [GetZReportCount](#GetZReportCount)
     - [GetZReportInfo](#GetZReportInfo)
