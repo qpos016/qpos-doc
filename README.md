@@ -10,6 +10,9 @@
     - [SaleReceipt](#SaleReceipt)
     - [RefundReceipt](#RefundReceipt)
     - [AdvanceReceipt](#AdvanceReceipt)
+- Info
+    - [FiscalModulInfo](#GetInfo)
+    - [SendReceipt](#SendReceipt)
     
 # Вкладка ZReport
 ZReport - раздел памяти ФМ который хранит суммы и кол-во пробитых чеков с даты времени начало открытия до даты времени ее закрытия.
@@ -553,3 +556,119 @@ JSON RPC v2 запрос аналогичен SaleReceipt ([SaleReceipt](#SaleRe
 | AppletVersion | string    | "Версия апплета в ФМ"                                     |
 | TerminalID    | string    | "Серийный номер ФМ"                                       |
 | DateTime      | string    | "Время регистрации чека (формат ГГГГММДДЧСМНСК)"          |
+
+## GetInfo
+Возвращается подробная информация о фискальном модуле.
+
+### Parameters
+
+| Name   | Mandatory | Example                    | Note                  |
+| ------ | --------- | -------------------------- | --------------------- |
+| method | yes       | "Api.GetInfo"              |                       |
+
+
+### Errors
+
+| HTTP Code | Code   | Message                             | Data                      |
+| --------- | ------ | ----------------------------------- | ------------------------- |
+| 200       | 0      | Success                             | OK                        |
+
+### Example requests/responses
+
+#### Request:
+
+```shell script
+curl --location --request POST '127.0.0.1:2040/api' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "method": "Api.GetInfo"
+}'
+```
+
+#### Success response:
+
+```json
+{
+    "code": 0,
+    "message": "OK",
+    "data": {
+        "TerminalID": "UZ210317263976",
+        "AppletVersion": "0324",
+        "CurrentTime": "2026-01-20 18:18:46",
+        "CurrentReceiptSeq": "2515",
+        "ReceiptCount": 0,
+        "ReceiptMaxCount": 480,
+        "ZReportCount": 228,
+        "ZReportMaxCount": 640,
+        "AvailablePersistentMemory": 10356,
+        "AvailableResetMemory": 709,
+        "AvailableDeselectMemory": 709
+    }
+}
+```
+| Field                | Type   | Description (RU)                                                                                                                     |
+|----------------------|--------|--------------------------------------------------------------------------------------------------------------------------------------|
+| AppletVersion        | string | Версия апплета в ФМ                                                                                                                  |
+| TerminalID           | string | Сер.№ ФМ где был зарегистрирован отзываемый чек                                                                                      |
+| CurrentReceiptSeq    | string | Номер последнего зарегистрированного чека                                                                                            |
+| CurrentTime          | string | Дата время последней операции ФМ (формат ГГГГ-ММ-ДД ЧС-МН-СК). Последующая дата должна быть хотя бы на 1 секунду позже               |
+| ReceiptCount         | uint16 | Кол-во не отправленных чеков в ОФД                                                                                                   |
+| ReceiptMaxCount      | uint16 | Вместимость для неотправленных чеков в памяти ФМ                                                                                     |
+| ZReportCount         | uint16 | Кол-во открытых/закрытых (включая текущий) ZReport                                                                                   |
+| ZReportMaxCount      | uint16 | Максимальный номер ZReport, по достижению которого больше нельзя будет открыть новый ZReport                                         |
+| AvailableXXXXMemory  | uint16 | Свободная память ФМ                                                                                                                  |
+
+## SendReceipt
+Отправка (суммы) чека из памяти ФМ на сервер ОФД. Функция вызывается только
+в том случае если файл БД хранящий FullReceipt стерся или был поврежден. Если
+чек не будет отправлен в течении 2 дней то ФМ заблокируется. Функция
+отправляет чек в ОФД, получает файл подтверждения и передает его в ФМ, тем
+самым разблокирует ФМ.
+
+### Parameters
+
+| Name   | Mandatory | Example                    | Note                  |
+| ------ | --------- | -------------------------- | --------------------- |
+| method | yes       | "Api.SendReceipt"          |                       |
+
+
+### Errors
+
+| HTTP Code | Code   | Message                             | Data                      |
+| --------- | ------ | ----------------------------------- | ------------------------- |
+| 200       | 0      | Success                             | OK                        |
+
+### Example requests/responses
+
+#### Request:
+
+```shell script
+curl --location '127.0.0.1:2040/api' \
+--header 'Content-Type: application/json' \
+--data '{
+    "method": "Api.SendReceipt"
+}'
+```
+
+#### Success response:
+
+```json
+{
+    "code": 0,
+    "message": "OK",
+    "data": {
+        "success": true,
+        "data": {
+            "AppletVersion": "0324",
+            "QueuedToSendCount": 0
+        },
+        "apiTime": "142 ms"
+    }
+}
+```
+| Field             | Type   | Description (RU)                                                                                                                                           |
+|-------------------|--------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| AppletVersion     | string | Версия апплета в ФМ                                                                                                                                        |
+| QueuedToSendCount | uint16 | Кол-во сформированных файлов чеков, ожидающих отправки                                                                                                     |
+| apiTime           | string | Значение поля `apiTime` желательно отображать в интерфейсе. Если время превышает 200 мс, рекомендуется повторять запрос, пока значение не станет ниже порога или пока не будет достигнут лимит попыток. |
+
