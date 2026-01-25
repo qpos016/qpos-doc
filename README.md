@@ -250,32 +250,34 @@ SaleReceipt - чек который хранит всю информацию о 
 | Name                    | Mandatory | Example                    | Note                                                                       |
 | ----------------------- | --------- | -------------------------- | -------------------------------------------------------------------------- |
 | method                  | yes       | "SaleReceipt"              |                                                                            |
+| CashierName             | yes       | "Имоилова Шахло"           | String - Кассир                                                            |
 |                                    RECEIPT                                                                                                    |
-| ReceivedCash            | yes       | 0                          | uint64 - Наличная сумма полученная от продажи в тийин                      |
-| ReceivedCard            | yes       | 10000                      | uint64 - Безналичная сумма полученная от продажи в тийин                   |
-| Time                    | yes       | "2023-06-16 17:51:15"      | string - Текущая дата, время регистрации чека (формат ГГГГ-ММ-ДД ЧС-МН-СК) |
+| ReceiptNumber           | yes       | "0"                        | string - Должна быть уникальной. При повторе вернёт тот же qr_url          |
+| ReceivedCash            | yes       | 0                          | uint64 - Наличные в тийин                                                  |
+| ReceivedCard            | yes       | 10000                      | uint64 - Безналичные в тийин                                               |
+| Time                    | yes       | "2023-06-16 17:51:15"      | string - Формат YYYY-MM-DD HH:MM:SS                                        |
 |                                    LOCATION                                                                                                   |
 | Latitude                | yes       | 41.29659100918041          | float64 - Широта                                                           |
 | Longitude               | yes       | 69.21791944847777          | float64 - Долгота                                                          |
 |                                    ExtraInfo                                                                                                  |
 | CardType                | no        | 1 - Корп., 2 - Физ.        | uint64                                                                     |
 |                                    ITEM                                                                                                       |
-| Name                    | yes       | "TEST ITEM"                | String - Наименование товара или услуги                                    |
+| Name                    | yes       | "TEST ITEM"                | String - Наименование товара/услуги                                        |
 | Barcode                 | yes       | "4712012121213"            | String - Товарный код                                                      |
 | SPIC                    | yes       | "02106999999000000"        | String - ИКПУ                                                              |
 | Label                   | yes       | "01047120121212130121"     | String - Код маркировки                                                    |
-| Units                   | yes       | 1                          | uint64 - Единица измерения                                                 |
+| Units                   | yes       | 1                          | uint64 - Ед. измерения                                                     |
 | PackageCode             | yes       | "57870871489456137366"     | String - Код упаковки                                                      |
-| Amount                  | yes       | 2000                       | uint64 - Количество товара                                                 |
-| Price                   | yes       | 560875                     | uint64 - Общая сумма позиции без учета скидок                              |
-| Discount                | yes       | 186958                     | uint64 - Cкидка                                                            |
+| Amount                  | yes       | 2000                       | uint64 - Кол-во                                                            |
+| Price                   | yes       | 560875                     | uint64 - Сумма без скидки                                                  |
+| Discount                | yes       | 186958                     | uint64 - Скидка                                                            |
 | VATPercent              | yes       | 12                         | uint8  - % НДС                                                             |
-| VAT                     | yes       | 560875                     | uint64 - НДС сумма                                                         |
-| OwnerType               | yes       | 0                          | uint64 - OwnerType                                                         |
-| CommissionInfo          | yes       | {}                         | Object - Признак комиссионного товара/услуги                               |
+| VAT                     | yes       | 560875                     | uint64 - Сумма НДС                                                         |
+| OwnerType               | yes       | 0                          | uint64                                                                     |
+| CommissionInfo          | yes       | {}                         | Object - Признак комиссионного товара                                      |
 |                                    CommissionInfo                                                                                             |
-| TIN                     | yes       | {}                         | String - ИНН                                                               |
-| PINFL                   | yes       | {}                         | String - ПИНФЛ                                                             |
+| TIN                     | yes       | "123456789"                | String - ИНН                                                               |
+| PINFL                   | yes       | "12345678901234"           | String - ПИНФЛ                                                             |
 
 ❗️ OwnerType maydonida aks ettirilgan belgilar quyidagi ma’lumotlarni ifodalaydi:
 • 0 (nol) – “Sotib olib, sotayotgan”;  
@@ -300,34 +302,33 @@ SaleReceipt - чек который хранит всю информацию о 
 {
     "method": "SaleReceipt",
     "params": {
-        "ReceivedCash": 0,
-        "ReceivedCard": 100000,
-        "Time": "2025-07-16 12:37:15",
+        "Cashier": "Имоилова Шахло",
+        "ReceiptNumber": "138",
+        "ReceivedCard": 0,
+        "ReceivedCash": 19000,
+        "Time": "2025-12-24 11:34:34",
         "Location": {
-            "Latitude": 41.29659100918041,
-            "Longitude": 69.21791944847777
+            "Latitude": 40.121601,
+            "Longitude": 65.368889
         },
         "ExtraInfo": {
             "CardType": 1
         },
         "Items": [
             {
-                "Name": "TEST LOGIX",
-                "Barcode": "2000291000008",
-                "SPIC": "02106999999000000",
+                "Name": "200 АСКОРБИНКА С ГЛЮКОЗОЙ + СА, ТАБ. №1",
+                "SPIC": "02106999028144288",
+                "Barcode": "4780046713435",
+                "Label": "",
                 "Units": 1,
-                "PackageCode": "57870871489456137366",
+                "PackageCode": "1334671",
+                "OwnerType": 0,
+                "Amount": 1000,
                 "VATPercent": 12,
-                "Discount": 0,
-                "Price": 100000,
-                "CommissionInfo": {
-                    "PINFL": "",
-                    "TIN": ""
-                },
-                "Amount": 2,
-                "VAT": 1,
-                "Other": 1,
-                "OwnerType": 0
+                "Price": 20000,
+                "Discount": 1000,
+                "Other": 0,
+                "VAT": 2036
             }
         ]
     }
@@ -382,6 +383,8 @@ SaleReceipt - чек который хранит всю информацию о 
 {
     "method": "RefundReceipt",
     "params": {
+        "ReceiptNumber": "138",
+        "Cashier": "Имоилова Шахло",
         "ReceivedCash": 300000,
         "Time": "2023-08-29 16:56:42",
         "Items": [
