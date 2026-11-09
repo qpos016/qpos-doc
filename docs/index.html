@@ -134,7 +134,7 @@
       <button class="theme-btn" id="themeBtn" title="Theme">🌙</button>
     </div>
     <div style="padding:0 14px 10px">
-      <a href="./openapi.json" download style="font-size:12px; color:var(--primary); font-weight:600">⤓ OpenAPI (Postman / codegen)</a>
+      <a href="./openapi.json" download id="specLink" style="font-size:12px; color:var(--primary); font-weight:600">⤓ OpenAPI (Postman / codegen)</a>
     </div>
     <nav id="nav"></nav>
   </aside>
@@ -144,11 +144,11 @@
 <script>
 const UI={
   uz:{fields:"Javob maydonlari",field:"Maydon",type:"Tur",note:"Izoh",required:"majburiy",optional:"ixtiyoriy",
-      recommended:"tavsiya",conditional:"shartli",request:"So'rov",response:"Javob",body:"Body"},
+      recommended:"tavsiya",conditional:"shartli",request:"So'rov",response:"Javob",body:"Body",search:"Qidirish",spec:"OpenAPI (Postman / codegen) yuklab olish"},
   ru:{fields:"Поля ответа",field:"Поле",type:"Тип",note:"Описание",required:"обязат.",optional:"необяз.",
-      recommended:"рекоменд.",conditional:"условно",request:"Запрос",response:"Ответ",body:"Body"},
+      recommended:"рекоменд.",conditional:"условно",request:"Запрос",response:"Ответ",body:"Body",search:"Поиск",spec:"Скачать OpenAPI (Postman / codegen)"},
   en:{fields:"Response fields",field:"Field",type:"Type",note:"Note",required:"required",optional:"optional",
-      recommended:"recommended",conditional:"conditional",request:"Request",response:"Response",body:"Body"}
+      recommended:"recommended",conditional:"conditional",request:"Request",response:"Response",body:"Body",search:"Search",spec:"Download OpenAPI (Postman / codegen)"}
 };
 const GROUPS={
   start:{uz:"Boshlanish",ru:"Начало",en:"Getting started"},
@@ -295,7 +295,7 @@ const SECTIONS=[
     desc:M("SaleReceipt bilan bir xil, lekin chek FMda ro'yxatga OLINMAYDI — javobda ReceiptSeq va FiscalSign bo'sh (QR ham bo'sh).",
       "Как SaleReceipt, но чек НЕ регистрируется в ФМ — ReceiptSeq и FiscalSign пустые (QR тоже пуст).",
       "Same as SaleReceipt, but NOT registered in the FM — ReceiptSeq and FiscalSign empty (QR empty too)."),
-    req:`{ "method": "AdvanceReceipt", "params": { "...": "SaleReceipt bilan bir xil" } }`,
+    req:M(`{ "method": "AdvanceReceipt", "params": { "...": "SaleReceipt bilan bir xil" } }`,`{ "method": "AdvanceReceipt", "params": { "...": "как в SaleReceipt" } }`,`{ "method": "AdvanceReceipt", "params": { "...": "same as SaleReceipt" } }`),
     res:[
       {s:"200",ok:1,code:`{
   "code": 0, "message": "OK",
@@ -449,7 +449,8 @@ console.log(await res.json());`}
 ];
 
 let lang=localStorage.getItem("qpos-lang")||"uz";
-const L=x=>x==null?"":(typeof x==="string"?x:(x[lang]||x.u||""));
+const LK={uz:"u",ru:"r",en:"e"};
+const L=x=>x==null?"":(typeof x==="string"?x:(x[LK[lang]]||x[lang]||x.u||""));
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 const hl=c=>esc(c)
   .replace(/(&quot;[^&]*?&quot;)(\s*:)/g,'<span class="k">$1</span>$2')
@@ -479,7 +480,7 @@ function proseBlock(b){const u=UI[lang];
 }
 function codePanel(s){const u=UI[lang];
   let html=`<div class="codecard"><div class="codebar"><span class="v">${s.verb}</span><span class="u">/api</span><span class="sp">${esc(s.method)}</span></div>`;
-  html+=`<div class="tabs"><span class="tab active">${u.request} · JSON</span></div><pre><code>${hl(s.req)}</code></pre></div>`;
+  html+=`<div class="tabs"><span class="tab active">${u.request} · JSON</span></div><pre><code>${hl(L(s.req))}</code></pre></div>`;
   if(s.res&&s.res.length){
     html+=`<div class="codecard"><div class="resp-tabs" data-resp="${s.id}">`+
       s.res.map((r,i)=>`<span class="rtab ${r.ok?'ok':'err'} ${i===0?'active':''}" data-i="${i}">${esc(r.s)}</span>`).join("")+`</div>`;
@@ -510,6 +511,9 @@ function render(){
   document.getElementById("nav").innerHTML=nav;
   document.getElementById("content").innerHTML=`<h1>QPOS Service — Fiskal API</h1>`+html;
   document.querySelectorAll(".pill").forEach(p=>p.classList.toggle("active",p.dataset.lang===lang));
+  document.documentElement.lang=lang;
+  document.getElementById("search").placeholder=UI[lang].search;
+  document.getElementById("specLink").textContent="⤓ "+UI[lang].spec;
   bindResp(); scrollSpy(); filterNav(document.getElementById("search").value);
 }
 function bindResp(){
