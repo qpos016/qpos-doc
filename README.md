@@ -1,5 +1,8 @@
 # ofd-doc
 
+> **Yangi interaktiv hujjat (UZ / RU / EN):** https://qpos016.github.io/qpos-doc/
+> OpenAPI spetsifikatsiyasi (Postman / codegen): https://qpos016.github.io/qpos-doc/openapi.json
+
 ## QPOS
 - ZReport
     - [GetZReportCount](#GetZReportCount)
