@@ -203,7 +203,7 @@ curl --location --request POST '127.0.0.1:2040/api' \
 #### Request:
 
 ```shell script
-curl --location --request POST '176.96.254.153:2040/api' \
+curl --location --request POST 'xxx.xxx.xxx.xxx:2040/api' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "method": "Api.CloseZReport"
