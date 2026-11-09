@@ -1,0 +1,294 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "QPOS Service — Fiskal API",
+    "version": "1.0.0",
+    "description": "Lokal fiskal JSON-RPC API. BARCHA metodlar `POST http://127.0.0.1:2040/api` manziliga, body'da `method` maydoni bilan yuboriladi. Har so'rovda `X-Api-Key` header MAJBURIY. Metodni tanlash uchun quyidagi example'lardan foydalaning (SaleReceipt, RefundReceipt, AdvanceReceipt, Api.OpenZReport, Api.CloseZReport, Api.GetZReportCount, Api.GetZReportInfo, Api.GetInfo, Api.SendReceipt).",
+    "contact": { "name": "QPOS", "url": "https://qpos.uz" }
+  },
+  "servers": [{ "url": "http://127.0.0.1:2040", "description": "Lokal fiskal servis (port config.yml, default 2040)" }],
+  "security": [{ "ApiKeyAuth": [] }],
+  "tags": [
+    { "name": "Cheklar", "description": "Sotuv, qaytarish, avans/kredit cheklari" },
+    { "name": "Smena", "description": "Z-hisobot ochish/yopish/holat" },
+    { "name": "Prochee", "description": "Fiskal modul holati, OFDga yuborish" }
+  ],
+  "paths": {
+    "/api": {
+      "post": {
+        "operationId": "rpc",
+        "summary": "JSON-RPC metod chaqiruvi",
+        "description": "Yagona endpoint. `method` maydoni qaysi amalни bajarishni belgilaydi. Har metod uchun tayyor example tanlang.",
+        "tags": ["Cheklar", "Smena", "Prochee"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/RpcRequest" },
+              "examples": {
+                "SaleReceipt": {
+                  "summary": "Sotuv cheki",
+                  "value": {
+                    "method": "SaleReceipt",
+                    "params": {
+                      "Cashier": "Ismoilova Shahlo",
+                      "ReceiptNumber": "138",
+                      "ReceivedCash": 1900000,
+                      "ReceivedCard": 0,
+                      "Time": "2025-12-24 11:34:34",
+                      "Location": { "Latitude": 40.12, "Longitude": 65.36 },
+                      "ExtraInfo": { "CardType": 1 },
+                      "Items": [
+                        {
+                          "Name": "ASKORBINKA, TAB. N1",
+                          "SPIC": "02106999028144288",
+                          "Barcode": "4780046713435",
+                          "Label": "",
+                          "Units": 1,
+                          "PackageCode": "1334671",
+                          "OwnerType": 0,
+                          "Amount": 1000,
+                          "VATPercent": 12,
+                          "Price": 2000000,
+                          "Discount": 100000,
+                          "Other": 0,
+                          "VAT": 203600,
+                          "CommissionInfo": { "TIN": "", "PINFL": "" }
+                        }
+                      ]
+                    }
+                  }
+                },
+                "RefundReceipt": {
+                  "summary": "Qaytarish cheki",
+                  "value": {
+                    "method": "RefundReceipt",
+                    "params": {
+                      "ReceiptNumber": "138",
+                      "Cashier": "Ismoilova Shahlo",
+                      "ReceivedCash": 300000,
+                      "ReceivedCard": 0,
+                      "Time": "2023-08-29 16:56:42",
+                      "Location": { "Latitude": 41.296591, "Longitude": 69.217919 },
+                      "Items": [
+                        {
+                          "SPIC": "03808001001000000",
+                          "Name": "TOVAR",
+                          "Units": 1476512,
+                          "Amount": 1000,
+                          "Price": 300000,
+                          "Discount": 0,
+                          "VATPercent": 12,
+                          "VAT": 0,
+                          "Other": 0,
+                          "CommissionInfo": { "PINFL": "", "TIN": "" }
+                        }
+                      ],
+                      "RefundInfo": {
+                        "TerminalID": "NA000000036172",
+                        "ReceiptSeq": "49",
+                        "DateTime": "20230829163133",
+                        "FiscalSign": "155580527246"
+                      }
+                    }
+                  }
+                },
+                "AdvanceReceipt": {
+                  "summary": "Avans / kredit chek (FMda ro'yxatga olinmaydi)",
+                  "value": {
+                    "method": "AdvanceReceipt",
+                    "params": {
+                      "ReceivedCash": 0,
+                      "ReceivedCard": 100000,
+                      "Time": "2025-07-17 12:53:15",
+                      "Location": { "Latitude": 41.29, "Longitude": 69.21 },
+                      "Items": [
+                        {
+                          "Name": "TEST",
+                          "SPIC": "02106999999000000",
+                          "Units": 1,
+                          "PackageCode": "57870871489456137366",
+                          "OwnerType": 0,
+                          "Amount": 2,
+                          "Price": 100000,
+                          "Discount": 0,
+                          "VATPercent": 12,
+                          "VAT": 1,
+                          "CommissionInfo": { "TIN": "", "PINFL": "" }
+                        }
+                      ]
+                    }
+                  }
+                },
+                "OpenZReport": { "summary": "Smena ochish", "value": { "method": "Api.OpenZReport" } },
+                "CloseZReport": { "summary": "Smena yopish", "value": { "method": "Api.CloseZReport" } },
+                "GetZReportCount": { "summary": "Z-hisobotlar soni", "value": { "method": "Api.GetZReportCount" } },
+                "GetZReportInfo": { "summary": "Z-hisobot tarkibi (Number: 0 joriy)", "value": { "method": "Api.GetZReportInfo", "params": { "Number": 0 } } },
+                "GetInfo": { "summary": "Fiskal modul holati", "value": { "method": "Api.GetInfo" } },
+                "SendReceipt": { "summary": "Chekni OFDga yuborish", "value": { "method": "Api.SendReceipt" } }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK (code=0) yoki fiskal/validatsiya xatosi (code!=0)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiResponse" },
+                "examples": {
+                  "Sale_OK": {
+                    "summary": "SaleReceipt muvaffaqiyat",
+                    "value": {
+                      "code": 0, "message": "OK",
+                      "data": {
+                        "QRCodeURL": "https://ofd.soliq.uz/check?t=ZZ9...&s=345221994543",
+                        "TerminalID": "ZZ999999999956",
+                        "ReceiptSeq": "280",
+                        "DateTime": "20201114170239",
+                        "FiscalSign": "345221994543"
+                      }
+                    }
+                  },
+                  "GetInfo_OK": {
+                    "summary": "GetInfo",
+                    "value": {
+                      "code": 0, "message": "OK",
+                      "data": {
+                        "TerminalID": "UZ210317263976", "AppletVersion": "0324",
+                        "CurrentTime": "2026-01-20 18:18:46", "CurrentReceiptSeq": "2515",
+                        "ReceiptCount": 0, "ReceiptMaxCount": 480,
+                        "ZReportCount": 228, "ZReportMaxCount": 640,
+                        "AvailablePersistentMemory": 10356, "IsBlocked": false
+                      }
+                    }
+                  },
+                  "Fiscal_Error": {
+                    "summary": "Fiskal xato (masalan 9031)",
+                    "value": { "code": -32000, "message": "9031", "data": "SEND_ALL_RECEIPTS_FIRST: ..." }
+                  },
+                  "ZReport_AlreadyOpen": {
+                    "summary": "Z-hisobot allaqachon ochiq",
+                    "value": { "code": 50021, "message": "ERROR_ZREPORT_IS_ALREADY_OPEN", "data": "Please, close Z-Report firstly!" }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "API kalit noto'g'ri yoki yo'q",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiResponse" },
+                "example": { "code": 401, "message": "UNAUTHORIZED", "data": "Invalid X-Api-Key" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": { "type": "apiKey", "in": "header", "name": "X-Api-Key", "description": "Terminal API kaliti. nginx pastki chiziqli headerni tashlashi mumkin — 'X-Api-Key' (tire) ishlatiladi." }
+    },
+    "schemas": {
+      "RpcRequest": {
+        "type": "object",
+        "required": ["method"],
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "Chaqiriladigan metod",
+            "enum": ["SaleReceipt", "RefundReceipt", "AdvanceReceipt", "Api.OpenZReport", "Api.CloseZReport", "Api.GetZReportCount", "Api.GetZReportInfo", "Api.GetInfo", "Api.SendReceipt"]
+          },
+          "params": {
+            "type": "object",
+            "description": "Metodga bog'liq parametrlar (chek/Z-hisobot uchun; ba'zi metodlarda yo'q)",
+            "properties": {
+              "Cashier": { "type": "string", "description": "Kassir ismi (tavsiya)" },
+              "ReceiptNumber": { "type": "string", "description": "Idempotentlik kaliti — YAGONA (GUID 36 ham). MAJBURIY." },
+              "ReceivedCash": { "type": "integer", "format": "int64", "description": "Naqd (tiyin)" },
+              "ReceivedCard": { "type": "integer", "format": "int64", "description": "Naqdsiz (tiyin)" },
+              "PaymentType": { "type": "integer", "description": "1 naqd, 2 karta, 3 QR, 4 aralash" },
+              "Time": { "type": "string", "example": "2025-12-24 11:34:34", "description": "YYYY-MM-DD HH:MM:SS" },
+              "Number": { "type": "integer", "description": "GetZReportInfo: 0 joriy, 1 oxirgi yopilgan…" },
+              "Location": { "$ref": "#/components/schemas/Location" },
+              "ExtraInfo": { "$ref": "#/components/schemas/ExtraInfo" },
+              "Items": { "type": "array", "items": { "$ref": "#/components/schemas/Item" } },
+              "RefundInfo": { "$ref": "#/components/schemas/RefundInfo" }
+            }
+          }
+        }
+      },
+      "Item": {
+        "type": "object",
+        "required": ["Name", "SPIC", "Units", "PackageCode", "Amount", "Price", "VATPercent", "VAT", "OwnerType"],
+        "properties": {
+          "Name": { "type": "string", "description": "Tovar/xizmat nomi" },
+          "SPIC": { "type": "string", "description": "MXIK (ИКПУ), 17 xona" },
+          "Barcode": { "type": "string" },
+          "Label": { "type": "string", "description": "Markirovka — faqat markirovkali (is_labeled) tovar uchun majburiy" },
+          "Labels": { "type": "array", "items": { "type": "string" }, "description": "Bir nechta marka (v10)" },
+          "Units": { "type": "integer", "format": "int64", "description": "O'lchov birligi kodi" },
+          "PackageCode": { "type": "string", "description": "O'lchov birligi (package) kodi" },
+          "Amount": { "type": "integer", "format": "int64", "description": "Miqdor (1000 = 1 dona)" },
+          "Price": { "type": "integer", "format": "int64", "description": "Chegirmasiz summa (tiyin)" },
+          "Discount": { "type": "integer", "format": "int64", "description": "Chegirma (tiyin)" },
+          "VATPercent": { "type": "integer", "description": "QQS foizi" },
+          "VAT": { "type": "integer", "format": "int64", "description": "QQS summasi (tiyin)" },
+          "OwnerType": { "type": "integer", "description": "0 qayta sotish, 1 o'z ishlab chiqarish, 2 xizmat" },
+          "Other": { "type": "integer", "format": "int64" },
+          "CommissionInfo": { "$ref": "#/components/schemas/CommissionInfo" }
+        }
+      },
+      "Location": {
+        "type": "object",
+        "properties": {
+          "Latitude": { "type": "number", "format": "double" },
+          "Longitude": { "type": "number", "format": "double" }
+        },
+        "description": "Yuborilmasa 0,0 (sozlamadan OLINMAYDI)"
+      },
+      "ExtraInfo": {
+        "type": "object",
+        "properties": {
+          "CardType": { "type": "integer", "description": "1 korporativ, 2 jismoniy" },
+          "CarNumber": { "type": "string" },
+          "PhoneNumber": { "type": "string" },
+          "QRPaymentID": { "type": "string" },
+          "QRPaymentProvider": { "type": "integer" },
+          "CardNumber": { "type": "string" },
+          "TIN": { "type": "string" },
+          "PINFL": { "type": "string" }
+        }
+      },
+      "CommissionInfo": {
+        "type": "object",
+        "properties": {
+          "TIN": { "type": "string" },
+          "PINFL": { "type": "string" }
+        }
+      },
+      "RefundInfo": {
+        "type": "object",
+        "required": ["TerminalID", "ReceiptSeq", "DateTime", "FiscalSign"],
+        "properties": {
+          "TerminalID": { "type": "string", "description": "Asl chek FM seriya raqami" },
+          "ReceiptSeq": { "type": "string", "description": "Asl chek raqami" },
+          "DateTime": { "type": "string", "description": "Asl chek vaqti (YYYYMMDDHHMMSS)" },
+          "FiscalSign": { "type": "string", "description": "Asl chek fiskal imzosi" }
+        }
+      },
+      "ApiResponse": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": { "type": "integer", "description": "0 — muvaffaqiyat; aks holda xato kodi" },
+          "message": { "type": "string" },
+          "data": { "description": "Metodga bog'liq natija (obyekt yoki matn)" }
+        }
+      }
+    }
+  }
+}
